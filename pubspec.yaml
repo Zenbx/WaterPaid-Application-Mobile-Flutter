@@ -1,0 +1,48 @@
+name: water_paid
+description: "WaterPaid - Water Management Application"
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  dio: ^5.9.0
+  flutter_riverpod: ^3.1.0
+  riverpod_annotation: ^4.0.0
+  shared_preferences: ^2.5.4
+  flutter_secure_storage: ^10.0.0
+  google_fonts: ^7.0.2
+  lucide_icons: ^0.257.0
+  mobile_scanner: ^7.1.4
+  intl: ^0.20.2
+  flutter_hooks: ^0.21.3+1
+  hooks_riverpod: ^3.1.0
+  json_annotation: ^4.9.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  riverpod_generator: ^4.0.0+1
+  build_runner: ^2.10.5
+  json_serializable: ^6.11.2
+  custom_lint: ^0.8.1
+  riverpod_lint: ^3.1.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/playstore.png"
+  adaptive_icon_foreground: "assets/playstore.png"
+  adaptive_icon_background: "#2563EB"
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/playstore.png

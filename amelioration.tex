@@ -1,0 +1,209 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{tcolorbox}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\geometry{margin=2cm}
+
+% --- COULEURS WATERPAID ---
+\definecolor{wpblue}{HTML}{0061FF}
+\definecolor{wpdark}{HTML}{0F172A}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+% --- CONFIGURATION DU CODE ---
+\lstset{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{wpblue},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{orange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+% --- CONFIGURATION DES TITRES ---
+\titleformat{\section}{\color{wpblue}\normalfont\Large\bfseries}{\thesection.}{0.5em}{}[\titlerule]
+\titleformat{\subsection}{\color{wpblue}\normalfont\large\bfseries}{\thesubsection.}{0.5em}{}
+\titleformat{\subsubsection}{\color{wpdark}\normalfont\normalsize\bfseries}{\thesubsubsection.}{0.5em}{}
+
+\begin{document}
+
+\section{Améliorations Systèmes et Documentation}
+
+\subsection{Sécurité et authentification}
+
+La sécurité du backend repose sur plusieurs mécanismes complémentaires formant une défense en profondeur. L'authentification des utilisateurs utilise des JSON Web Tokens (JWT) conformément au standard RFC 7519. Lors de la connexion, le serveur vérifie les identifiants fournis et, s'ils sont valides, génère un JWT signé via l'algorithme HS256 contenant l'identifiant unique de l'utilisateur (champ \texttt{sub}), son type de compte (\texttt{user} ou \texttt{admin}) et une date d'expiration. Ce token est retourné au client qui doit l'inclure dans l'en-tête \texttt{Authorization} avec le schéma \texttt{Bearer} de toutes les requêtes ultérieures.
+
+Chaque point d'entrée de l'API est protégé par des dépendances d'authentification (\textit{FastAPI Security}) qui vérifient la présence et la validité du token avant de traiter la requête. Un système d'autorisation granulaire (\texttt{get\_current\_user} et \texttt{get\_current\_admin}) vérifie que l'utilisateur possède les permissions nécessaires. Par exemple, seuls les administrateurs peuvent accéder aux fonctions de gestion globale, tandis que les utilisateurs ordinaires ne peuvent consulter que les informations de leurs propres compteurs.
+
+L'ensemble des communications entre les clients et le serveur transite via HTTPS utilisant TLS 1.3 pour garantir la confidentialité et l'intégrité des données échangées. Un certificat SSL délivré par l'autorité de certification Let's Encrypt assure également l'authentification du serveur auprès des clients.
+
+Les mots de passe ne sont jamais stockés en clair dans la base de données. Le système utilise l'algorithme de hachage de pointe \textbf{Argon2id} (vainqueur de la Password Hashing Competition). Contrairement aux méthodes plus anciennes comme SHA-256 ou bcrypt, Argon2id est conçu pour offrir une résistance maximale aux attaques par force brute exploitant des processeurs graphiques (GPU) ou des circuits dédiés (ASIC), grâce à un paramétrage rigoureux de la mémoire et du temps de calcul lors du scellement.
+
+\begin{lstlisting}[language=Python, caption=Implémentation du hachage Argon2id]
+from argon2 import PasswordHasher
+ph = PasswordHasher(time_cost=2, memory_cost=65536, parallelism=1)
+
+def hash_password(password: str) -> str:
+    return ph.hash(password)
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    try:
+        ph.verify(hashed_password, plain_password)
+        return True
+    except:
+        return False
+\end{lstlisting}
+
+La prévention des injections SQL s'appuie sur l'utilisation systématique de l'ORM \textbf{SQLAlchemy}. Les interactions avec la base de données s'effectuent via des requêtes préparées (\textit{prepared statements}) où les paramètres utilisateurs sont auto-échappés, empêchant un attaquant d'injecter du code SQL malveillant via les champs de saisie.
+
+\section{Conception de l'application mobile}
+
+\subsection{Choix technologique et architecture}
+
+Le développement de l'application mobile a été orienté vers une solution multiplateforme utilisant le framework \textbf{Flutter}. Ce choix permet de bénéficier de performances natives tout en maintenant une base de code unique pour Android et iOS. L'architecture logicielle adopte le patron \textbf{Riverpod} (évolution du Provider), qui sépare clairement la logique métier de l'interface utilisateur.
+
+Les trois couches de l'architecture sont organisées comme suit :
+\begin{itemize}
+    \item \textbf{Modèle (Model)} : Représente les données (classes User, Meter, Refill) avec sérialisation asynchrone.
+    \item \textbf{Vue (View/Widgets)} : Composants d'interface utilisateur déclaratifs réagissant aux changements d'état.
+    \item \textbf{Providers} : Couche logique exposant les données au format réactif (Stream/Future) et gérant les interactions.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{images/architecture_riverpod.png}
+\caption{Architecture Riverpod de l'application mobile WaterPaid}
+\label{fig:riverpod}
+\end{figure}
+
+La communication avec le backend est centralisée dans un \texttt{ApiService} utilisant la bibliothèque \textbf{Dio}, configurée avec des intercepteurs pour la gestion automatique du token JWT.
+
+\subsection{Interfaces utilisateur et expérience}
+
+L'interface destinée aux consommateurs privilégie la simplicité. L'écran d'accueil présente immédiatement les trois informations essentielles : le crédit restant, la consommation du jour et l'état actuel de la vanne. Un système de \textbf{WebSocket} permet la mise à jour en temps réel sans intervention de l'utilisateur.
+
+L'écran de recharge guide l'utilisateur à travers un processus fluide intégrant des montants prédéfinis pour les volumes courants (10L, 25L, 50L, 100L). Le calcul du prix est basé sur un taux de 10 FCFA/Litre.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.3\textwidth}
+    \includegraphics[width=\textwidth]{images/mockup_home.png}
+    \caption{Écran d'accueil}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.3\textwidth}
+    \includegraphics[width=\textwidth]{images/mockup_consumption.png}
+    \caption{Historique Conso}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.3\textwidth}
+    \includegraphics[width=\textwidth]{images/mockup_refill.png}
+    \caption{Interface Recharge}
+\end{subfigure}
+\caption{Maquettes de l'interface utilisateur unifiée}
+\label{fig:mockups_user}
+\end{figure}
+
+L'interface administrateur adopte une présentation dense avec des \textit{Key Performance Indicators} (KPI) : nombre de compteurs actifs, total des revenus, et alertes techniques. Elle permet également le scan de QR Code pour lier de nouveaux compteurs via le scanner intégré.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{images/mockup_admin.png}
+\caption{Tableau de bord Administrateur - Supervision globale}
+\label{fig:mockup_admin}
+\end{figure}
+
+\subsection{Système de notifications et Temps Réel}
+
+Le système repose sur un flux duplex via \textbf{WebSockets} et des notifications push. Cela permet de notifier l'utilisateur instantanément dès qu'un uplink LoRaWAN est reçu. Les alertes critiques (crédit épuisé, fuite détectée) déclenchent des mises à jour immédiates sur l'interface.
+
+\begin{lstlisting}[language=dart, caption=Consommation du flux WebSocket en Flutter]
+void listenToDevice(String meterId) {
+    final channel = IOWebSocketChannel.connect('ws://api/ws/devices/$meterId');
+    channel.stream.listen((data) {
+        final decoded = jsonDecode(data);
+        state = state.copyWith(
+            volume: decoded['volume'],
+            valveOpen: decoded['valve_state'] == 'open'
+        );
+    });
+}
+\end{lstlisting}
+
+\subsection{Diagrammes UML}
+
+\subsubsection{Cas d'utilisation}
+Le diagramme identifie les acteurs (Utilisateur, Admin) et leurs interactions : recharge, consultation, supervision.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{images/use_case_diagram.png}
+\caption{Diagramme de cas d'utilisation global}
+\label{fig:use_case}
+\end{figure}
+
+\subsubsection{Séquence de Recharge}
+Illustre le flux complet : Mobile -> Backend -> PayUnit/Momo -> Backend -> MQTT (Downlink) -> Compteur.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{images/sequence_recharge.png}
+\caption{Diagramme de séquence - Processus de recharge LoRaWAN}
+\label{fig:seq_recharge}
+\end{figure}
+
+\section{Conception du backend et de l'infrastructure serveur}
+
+\subsection{Architecture et technologies}
+
+Le backend utilise \textbf{FastAPI} pour ses performances asynchrones. L'architecture est découpée en :
+\begin{itemize}
+    \item \textbf{Routers} : Endpoints REST (u/a/auth).
+    \item \textbf{Services} : Logique métier (calcul de crédit, notifications).
+    \item \textbf{Repositories} : Accès PostgreSQL via SQLAlchemy.
+\end{itemize}
+
+\subsection{Modèle de données}
+
+Le schéma PostgreSQL stocke les entités critiques. La table \texttt{meters} contient les identifiants LoRa (\texttt{dev\_eui}) et le crédit en litres. La table \texttt{refills} assure la traçabilité financière totale.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{images/schema_bdd.png}
+\caption{Schéma Relationnel de la Base de Données (PostgreSQL)}
+\label{fig:schema_bdd}
+\end{figure}
+
+\begin{lstlisting}[language=Python, caption=Définition du modèle Meter avec SQLAlchemy]
+class Meter(Base):
+    __tablename__ = "meters"
+    meter_id = Column(UUID, primary_key=True, default=uuid.uuid4)
+    dev_eui = Column(String(16), unique=True, index=True)
+    credit_liters = Column(Float, default=0.0)
+    valve_state = Column(String(10), default="closed")
+    user_id = Column(UUID, ForeignKey("users.user_id"), nullable=True)
+\end{lstlisting}
+
+\end{document}
