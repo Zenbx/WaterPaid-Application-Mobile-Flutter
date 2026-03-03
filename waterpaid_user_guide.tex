@@ -1,282 +1,357 @@
-\documentclass[11pt,a4paper]{article}
-
+\documentclass[a4paper,12pt]{report}
 \usepackage[utf8]{inputenc}
-\usepackage[french]{babel}
 \usepackage[T1]{fontenc}
+\usepackage[french]{babel}
 \usepackage{graphicx}
-\usepackage{xcolor}
-\usepackage{hyperref}
 \usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{float}
 \usepackage{titlesec}
+\usepackage{xcolor}
 \usepackage{enumitem}
-\usepackage{tcolorbox}
-\usepackage{fancyhdr}
-\usepackage{bookmark}
 
-\geometry{margin=2cm}
+% Configuration des marges
+\geometry{hmargin=2.5cm,vmargin=2.5cm}
 
-% --- COULEURS WATERPAID ---
-\definecolor{wpblue}{HTML}{0061FF}
-\definecolor{wpcyan}{HTML}{00D1FF}
-\definecolor{wpdark}{HTML}{0F172A}
-\definecolor{wpbg}{HTML}{F8FAFC}
-\definecolor{success}{HTML}{22C55E}
-\definecolor{warning}{HTML}{F59E0B}
-
-% --- CONFIGURATION DES TITRES ---
-\titleformat{\section}{\color{wpblue}\normalfont\Large\bfseries}{\thesection.}{0.5em}{}[\titlerule]
-\titleformat{\subsection}{\color{wpblue}\normalfont\large\bfseries}{\thesubsection.}{0.5em}{}
-
-% --- CONFIGURATION DU HEADER/FOOTER ---
-\pagestyle{fancy}
-\fancyhf{}
-\lhead{\color{wpblue}\textbf{WaterPaid} - Manuel Complet}
-\rhead{\thepage}
-\lfoot{\small © 2026 WaterPaid - L'eau Intelligente}
-
-% --- PAGE DE GARDE ---
-\title{
-    \vspace{2cm}
-    \textbf{\Huge WaterPaid} \\
-    \vspace{0.5cm}
-    {\large \textit{Guide d'Installation et d'Utilisation}} \\
-    \vspace{1.5cm}
-    \includegraphics[width=0.3\textwidth]{logo.png} \\ 
-    \vspace{1cm}
-    \textbf{\LARGE MANUEL UTILISATEUR COMPLET} \\
-    \vspace{0.5cm}
-    \textit{Pour les Gestionnaires et les Familles} \\
-    \vspace{1cm}
-    \small{Version 4.0 — Édition Exhaustive}
+% Configuration des liens hypertextes
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Guide Utilisateur WaterPaid},
+    pdfpagemode=FullScreen,
 }
-\author{Documentation WaterPaid}
-\date{\today}
+
+% Couleurs personnalisées
+\definecolor{waterblue}{RGB}{37, 99, 235}
+\definecolor{darkslate}{RGB}{15, 23, 42}
+
+% Formatage des titres
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries}{}{0pt}{\Huge}
+\titlespacing*{\chapter}{0pt}{-50pt}{20pt}
 
 \begin{document}
 
-\maketitle
-\thispagestyle{empty}
-\newpage
+% Page de titre
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    
+    {\Huge \textbf{WaterPaid}}\\[0.5cm]
+    {\Large \textit{Système de Gestion Intelligente de l'Eau}}\\[2cm]
+    
+    \includegraphics[width=0.4\textwidth]{assets/waterpaid_logo.png} % Placeholder logo if available, or remove
+    \\[2cm]
+    
+    {\Huge \textbf{Guide Utilisateur}}\\[1cm]
+    {\Large Manuel Complet pour Consommateurs et Superviseurs}\\[2cm]
+    
+    \vfill
+    
+    {\large \today}\\[1cm]
+    
+\end{titlepage}
 
+% Table des matières
 \tableofcontents
 \newpage
 
-\section{Introduction}
-Ce guide est conçu pour vous accompagner pas-à-pas dans l'utilisation de l'écosystème **WaterPaid**. 
-Nous avons séparé les instructions en deux grandes parties : 
-\begin{enumerate}
-    \item **Pour le Gestionnaire (Admin)** : De la réception du matériel à la gestion quotidienne.
-    \item **Pour l'Utilisateur (Client)** : De l'installation de l'application à l'achat d'eau.
-\end{enumerate}
+% Introduction
+\chapter{Introduction}
+Bienvenue dans le guide utilisateur de \textbf{WaterPaid}. Ce document détaille l'utilisation complète de l'application mobile, conçue pour révolutionner la gestion et la distribution de l'eau.
 
----
-
-\section{PARTIE 1 : LE GESTIONNAIRE (ADMINISTRATEUR)}
-\textit{Vous êtes le responsable technique ou le distributeur qui installe les compteurs.}
-
-\subsection{Phase 1 : Mise en service du matériel (L'Atelier)}
-Avant même d'aller chez le client, vous devez préparer les compteurs.
-
-\subsubsection{1. Allumage du compteur}
-Chaque compteur possède un interrupteur de sécurité pour le transport.
+L'application se divise en deux interfaces distinctes :
 \begin{itemize}
-    \item Localisez le petit interrupteur sur le côté ou en-dessous du boîtier.
-    \item Basculez-le sur la position **"AL"** (Allumé).
-    \item Le compteur va émettre un signal ou un voyant va clignoter pour indiquer qu'il est vivant.
+    \item \textbf{L'Interface Consommateur} : Pour les abonnés, permettant de suivre leur consommation, recharger leur crédit et gérer leur compteur.
+    \item \textbf{L'Interface Administrateur (Superviseur)} : Pour les gestionnaires, offrant une vue globale sur le parc de compteurs, les utilisateurs et les transactions financières.
 \end{itemize}
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.4\textwidth]{images/hardware_switch.png}
-    \caption{Mise sous tension : Interrupteur sur "AL"}
-\end{figure}
+Ce guide vous accompagnera étape par étape à travers chaque fonctionnalité.
 
-\subsubsection{2. Création de votre compte Admin}
-Maintenant que le compteur est allumé, il faut le dire à l'application.
-\begin{enumerate}
-    \item Téléchargez l'application **WaterPaid**.
-    \item Cliquez sur **"S'inscrire"**.
-    \item **IMPORTANT** : Sélectionnez le rôle **"ADMINISTRATEUR"** (et non Utilisateur).
-    \item Entrez votre nom, votre numéro pro et un mot de passe sécurisé.
-\end{enumerate}
-
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.4\textwidth]{images/inscription.png}
-    \caption{Écran d'inscription (Bien choisir Admin)}
-\end{figure}
-
-\subsubsection{3. Enregistrement du compteur dans le système}
-C'est l'étape clé où le compteur devient "intelligent".
-\begin{enumerate}
-    \item Connectez-vous à votre compte Admin.
-    \item Allez dans l'onglet **Compteurs** (icône Jauge).
-    \item Cliquez sur le bouton **"Ajouter"**.
-    \item Remplissez les champs :
-        \begin{itemize}
-            \item **Numéro de Série (S/N)** : Écrit sur l'étiquette du compteur.
-            \item **DevEUI** : L'identifiant radio unique (souvent un code long avec des chiffres et lettres).
-        \end{itemize}
-    \item Validez. L'application va vous générer un **TOKEN** (un code secret unique).
-    \item **NOTEZ CE TOKEN** : Vous devrez le donner au client final.
-\end{enumerate}
-
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.4\textwidth]{images/admin_create_meter.png}
-    \caption{Formulaire d'ajout de compteur}
-\end{figure}
-
-\subsection{Phase 2 : L'Installation chez le Client (Le Terrain)}
-Tout est prêt numériquement. Passons à l'installation physique.
-
-\begin{enumerate}
-    \item **Sécurité** : Éteignez le compteur (Interrupteur sur OFF) pour le transport jusqu'au domicile.
-    \item **Plomberie** : Coupez l'arrivée d'eau principale.
-    \item Installez le compteur **juste après** le robinet d'arrêt général. Assurez-vous que les flèches sur le tuyau suivent le sens de l'eau.
-    \item **Mise en marche finale** : Une fois posé, remettez l'interrupteur sur **"AL"**.
-    \item Ouvrez l'eau doucement. Vérifiez qu'il n'y a pas de fuite.
-\end{enumerate}
-
-\subsection{Phase 3 : Vos Outils de Gestion Quotidienne}
-Votre application Admin est un véritable tableau de bord professionnel.
-
-\subsubsection{Le Dashboard (Vue d'ensemble)}
-Dès l'ouverture, vous voyez la santé de votre réseau :
-\begin{itemize}
-    \item **Revenus Totaux (Vert)** : L'argent encaissé par toutes les recharges.
-    \item **Volume (Bleu)** : Le total des mètres cubes d'eau distribués.
-    \item **Compteurs Actifs (Orange)** : Nombre d'appareils qui répondent bien au réseau.
-    \item **Clients (Gris)** : Nombre de familles desservies.
-\end{itemize}
-
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.6\textwidth]{images/dashboard_admin.png}
-    \caption{Tableau de bord Administrateur}
-\end{figure}
-
-\subsubsection{Gérer les Utilisateurs et les Problèmes}
-Dans l'onglet **Utilisateurs**, vous pouvez aider un client en difficulté :
-\begin{itemize}
-    \item **Recherche** : Trouvez un client par son nom ou son numéro.
-    \item **Détails** : Voyez s'il a du crédit ou si sa vanne est fermée.
-    \item **Recharge Manuelle** : Si un client vous paye en espèces (CASH), c'est ici que vous lui envoyez l'eau manuellement.
-    \item **Rapports** : Dans les paramètres, téléchargez un bilan PDF de vos activités.
-\end{itemize}
-
----
-
-\section{PARTIE 2 : L'UTILISATEUR (LE FOYER)}
-\textit{Vous êtes le client qui consomme l'eau à la maison.}
-
-\subsection{Phase 1 : Bienvenue chez WaterPaid}
-Votre compteur a été installé par le pro. Voici comment prendre le contrôle.
-
-\subsubsection{1. Créer son compte}
-\begin{enumerate}
-    \item Ouvrez l'application **WaterPaid**.
-    \item Cliquez sur **"S'inscrire"**.
-    \item Choisissez le rôle **"UTILISATEUR"** (c'est le choix par défaut).
-    \item Mettez votre nom et votre numéro de téléphone. C'est tout !
-\end{enumerate}
-
-\subsubsection{2. Lier votre compteur (La clé magique)}
-Pour voir votre consommation, il faut dire à l'application quel est *votre* compteur.
-\begin{enumerate}
-    \item Sur l'accueil, cliquez sur le gros bouton **"+" Bleu**.
-    \item **Option A (Facile)** : Scannez le QR Code que l'installateur a collé sur le compteur.
-    \item **Option B (Manuelle)** : Tapez le **Token** (le code secret) que l'installateur vous a donné.
-    \item Cliquez sur **"Lier"**. Une carte blanche apparaît : c'est votre compteur !
-\end{enumerate}
-
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.4\textwidth]{images/scan_qr.png}
-    \caption{Liaison du compteur par QR Code ou Token}
-\end{figure}
-
-\subsection{Phase 2 : Utilisation Quotidienne}
-
-\subsubsection{Le Tableau de Bord (Dashboard)}
-Tout ce qu'il faut savoir en un coup d'œil :
-\begin{itemize}
-    \item **Solde Global (En haut)** : L'argent total disponible dans votre portefeuille virtuel.
-    \item **Vos Compteurs** : Si vous en avez plusieurs (Maison, Boutique), ils sont listés ici.
-    \item **Dernières activités** : Pour savoir quand vous avez rechargé la dernière fois.
-\end{itemize}
-
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.4\textwidth]{images/dashboard_user.png}
-    \caption{Votre espace personnel}
-\end{figure}
-
-\subsubsection{Tout savoir sur votre compteur (Les Détails)}
-Cliquez sur votre compteur pour voir ses secrets.
-\begin{itemize}
-    \item **Jauge d'Eau** : Elle se vide au fur et à mesure que vous consommez.
-    \item **Icône Signal (Radio)** : Indique si le compteur capte bien le réseau.
-    \item **Icône Pile (Batterie)** : Indique si la batterie du compteur est bonne.
-    \item **La Vanne (Robinet)** : 
-        \begin{itemize}
-            \item \textbf{Cercle Vert} = Ouverte, l'eau coule.
-            \item \textbf{Cercle Rouge} = Fermée, pas de crédit ou problème.
-        \end{itemize}
-\end{itemize}
-
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.4\textwidth]{images/details_compteur.png}
-    \caption{Détails techniques simplifiés}
-\end{figure}
-
-\subsubsection{Comment acheter de l'eau ? (Recharger)}
-Plus d'eau ? Pas de panique, ça prend 30 secondes.
-\begin{enumerate}
-    \item Cliquez sur le bouton **"Recharger"**.
-    \item Tapez le montant en FCFA (ex: 1000 F).
-    \item Choisissez **Mobile Money** (Orange/MTN) ou **Cash** (si déjà payé).
-    \item Validez sur votre téléphone.
-    \item **Magie !** En quelques instants, le compteur reçoit l'ordre et l'eau revient.
-\end{enumerate}
-
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.4\textwidth]{images/recharge_payunit.png}
-    \caption{Recharge facile par Mobile Money}
-\end{figure}
-
-\subsection{Phase 3 : Vos Paramètres}
-Dans l'onglet **Profil** (icône Bonhomme), vous pouvez :
-\begin{itemize}
-    \item Changer votre mot de passe.
-    \item Passer l'application en **Mode Sombre** (Dark Mode) pour ne pas vous éblouir la nuit.
-    \item Contacter le **Support** si vous avez une fuite ou un souci.
-\end{itemize}
-
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.4\textwidth]{images/profil_settings.png}
-    \caption{Réglages et préférences}
-\end{figure}
-
----
-
-\section{Dépannage Rapide (FAQ)}
-
-\textbf{Q: J'ai payé mais l'eau ne revient pas tout de suite.} \\
-R: Le réseau radio peut prendre jusqu'à 2 minutes pour recevoir l'ordre. Attendez un peu. Si ça dépasse 5 minutes, contactez le support.
-
-\textbf{Q: Je n'arrive pas à scanner le QR Code.} \\
-R: Vérifiez que vous avez autorisé l'application à utiliser votre caméra. Sinon, entrez le code manuellement.
-
-\textbf{Q: La batterie du compteur est faible (Rouge).} \\
-R: Prévenez votre gestionnaire. Il viendra changer la pile. N'essayez pas de l'ouvrir vous-même !
-
-\vspace{2cm}
+\section{Accès à l'Application}
+Pour commencer, rendez-vous sur le site officiel de WaterPaid pour télécharger l'application :
 \begin{center}
-    \textit{Merci d'utiliser WaterPaid. L'eau potable, gérée intelligemment.}
+    \href{https://waterpaid.vercel.app}{\textbf{waterpaid.com}}
 \end{center}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{captures/Interfaces/Capture d'écran 2026-02-18 003226.png}
+    \caption{Landing Page - Hero Section : Point d'entrée pour découvrir WaterPaid}
+    \label{fig:landing_hero}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{captures/Interfaces/Capture d'écran 2026-02-18 003243.png}
+    \caption{Landing Page - Section des Fonctionnalités}
+\end{figure}
+
+Une fois l'application installée, lancez-la pour accéder à l'écran de connexion.
+
+% ==================================================================
+%  PARTIE I — PARCOURS UTILISATEUR (CLIENT)
+% ==================================================================
+\chapter{Parcours Utilisateur (Vue Consommateur)}
+
+Le parcours utilisateur couvre l'ensemble des interactions d'un abonné depuis sa première connexion jusqu'à la gestion complète de son compte et de sa consommation d'eau.
+
+\section{Connexion et Authentification}
+
+\subsection{Étape 1 — Connexion}
+L'écran de connexion constitue le point d'entrée principal de l'application. L'utilisateur saisit son identifiant (numéro de téléphone ou email) ainsi que son mot de passe. 
+
+À la validation, le système vérifie les identifiants de manière sécurisée et redirige automatiquement l'utilisateur vers son tableau de bord personnel.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{captures/Interfaces/Login.png}
+    \caption{Écran de connexion — Authentification sécurisée unique.}
+    \label{fig:login_user}
+\end{figure}
+
+\subsection{Étape 2 — Création de Compte}
+Si vous êtes un nouvel utilisateur, utilisez le formulaire d'inscription pour créer votre compte. Renseignez vos informations personnelles : nom, prénom, téléphone et mot de passe. Une fois validé, vous pourrez vous connecter immédiatement.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{captures/Interfaces/CreerunCompte.png}
+    \caption{Écran de création de compte — Inscription simple et rapide.}
+    \label{fig:create_account}
+\end{figure}
+
+\section{Gestion Quotidienne}
+
+\subsection{Étape 3 — Tableau de Bord Utilisateur}
+Le tableau de bord est votre centre de contrôle. Il vous offre une vue synthétique et temps réel de votre situation :
+\begin{itemize}
+    \item \textbf{Jauge de Crédit} : Visualisez instantanément votre solde en Litres et en FCFA.
+    \item \textbf{État de la Vanne} : Sachez si votre eau est ouverte ou coupée.
+    \item \textbf{Consommation} : Suivez vos statistiques pour mieux gérer votre budget.
+    \item \textbf{Actions Rapides} : Rechargez, liez un compteur ou consultez l'historique en un clic.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{captures/Interfaces/DashboardUser.png}
+    \caption{Tableau de bord utilisateur — Tout votre compte en un coup d'œil.}
+    \label{fig:dashboard_user}
+\end{figure}
+
+\subsection{Étape 4 — Associer un Compteur (Lier)}
+Pour utiliser le service, vous devez lier votre compte à un compteur physique WaterPaid.
+\begin{enumerate}
+    \item Munissez-vous du code d'association (Token) fourni par votre gestionnaire.
+    \item Ouvrez le scanner QR Code depuis l'application.
+    \item Scannez le code sur le compteur ou entrez le token manuellement.
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{captures/Interfaces/CodeQR.png}
+    \caption{Scanner QR Code — Association facile du compteur.}
+    \label{fig:qr_code}
+\end{figure}
+
+\subsection{Étape 5 — Recharger son Crédit}
+Ne soyez jamais à court d'eau grâce au module de paiement intégré :
+\begin{enumerate}
+    \item Choisissez un montant prédéfini ou saisissez une somme personnalisée.
+    \item L'équivalent en volume d'eau est calculé automatiquement.
+    \item Sélectionnez votre méthode de paiement (Mobile Money, Carte).
+    \item Validez : votre vanne s'ouvre quasi-instantanément.
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{captures/Interfaces/Payement.png}
+    \caption{Module de paiement — Rechargement flexible et instantané.}
+    \label{fig:payment}
+\end{figure}
+
+\subsection{Étape 6 — Historique des Transactions}
+Gardez une trace de toutes vos dépenses. L'historique détaille chaque recharge avec la date, le montant et le volume d'eau obtenu, vous permettant une transparence totale sur votre consommation.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{captures/Interfaces/TransactionHistory.png}
+    \caption{Historique des transactions — Suivi de vos recharges.}
+    \label{fig:transaction_history}
+\end{figure}
+
+\section{Paramètres du Compte}
+
+\subsection{Étape 7 — Profil et Préférences}
+Gérez vos informations personnelles et les paramètres de l'application (notifications, thème sombre/clair, langue) depuis l'écran de profil. C'est également ici que vous pouvez vous déconnecter de manière sécurisée.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{captures/Interfaces/DetailsUser.png}
+    \caption{Profil Utilisateur — Gestion de vos informations.}
+    \label{fig:details_user}
+\end{figure}
+
+
+% ==================================================================
+%  PARTIE II — PARCOURS ADMINISTRATEUR (SUPERVISEUR)
+% ==================================================================
+\chapter{Parcours Administrateur (Vue Superviseur)}
+
+L'interface administrateur est un véritable cockpit de supervision, conçu pour gérer efficacement un parc de compteurs intelligents et une base d'abonnés.
+
+\section{Supervision Globale}
+
+\subsection{Étape 1 — Tableau de Bord Administrateur}
+Dès la connexion, le tableau de bord vous donne le pouls de votre réseau :
+\begin{itemize}
+    \item \textbf{KPIs Financiers} : Chiffre d'affaires, volume distribué.
+    \item \textbf{État du Parc} : Nombre de compteurs actifs, alertes batteries.
+    \item \textbf{Graphiques} : Évolution des revenus en temps réel.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{captures/Interfaces/AdminDashboard.png}
+    \caption{Tableau de bord Admin — Supervision globale de l'activité.}
+    \label{fig:admin_dashboard}
+\end{figure}
+
+\section{Gestion du Parc (De l'Achat à l'Installation)}
+
+Cette section vous guide pas à pas, de l'achat de votre matériel jusqu'à son installation chez le client.
+
+\subsection{Étape Préalable — Acquisition du Compteur Physique}
+Avant toute chose, en tant qu'Administrateur, vous devez vous procurer les compteurs d'eau intelligents WaterPaid.
+\begin{enumerate}
+    \item \textbf{Commande} : Contactez le service commercial WaterPaid ou votre distributeur agréé pour acheter des compteurs.
+    \item \textbf{Réception} : Vous recevrez un carton contenant le compteur, sa vanne électronique et une carte contenant son Numéro de Série unique (ex: WP-123456).
+    \item \textbf{Stockage} : Gardez ces compteurs en stock jusqu'à ce qu'un client demande un raccordement.
+\end{enumerate}
+
+\subsection{Étape — Installation et Gestion Physique du Compteur}
+\textit{(Cette section sera complétée ultérieurement avec les détails techniques sur le vissage, la pose des joints et le raccordement à la tuyauterie).}
+\vspace{2cm} % Espace pour le futur contenu
+\noindent\rule{\linewidth}{0.4pt}
+
+\subsection{Étape 3 — Inventaire et Création (Le Jumeau Numérique)}
+Une fois le compteur physique en votre possession, vous devez l'enregistrer dans l'application pour le rendre "intelligent".
+C'est ce qu'on appelle créer un "Compteur Virtuel" :
+\begin{enumerate}
+    \item Allez dans l'onglet \textbf{Compteurs} de l'application.
+    \item Cliquez sur le bouton \textbf{"+ Nouveau Compteur"} (généralement en bas à droite).
+    \item Entrez le \textbf{Numéro de Série} inscrit sur le boîtier du compteur physique.
+    \item Validez : Le compteur apparaît désormais dans votre liste. Il est prêt à être lié !
+\end{enumerate}
+
+Accédez ensuite à la liste complète de vos dispositifs pour vérifier qu'il est bien "En ligne".
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{captures/Interfaces/MetersManagement.png}
+    \caption{Gestion des compteurs — Inventaire et état des lieux.}
+    \label{fig:meters_management}
+\end{figure}
+
+\subsection{Étape 4 — Détail et Contrôle Technique}
+En sélectionnant un compteur, vous accédez à sa fiche technique détaillée. Vous pouvez alors :
+\begin{itemize}
+    \item Voir l'historique de ses états et consommations.
+    \item \textbf{Commander la vanne à distance} (Ouverture/Fermeture forcée).
+    \item Identifier l'abonné associé.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{captures/Interfaces/MeterDetails.png}
+    \caption{Détail Compteur — Contrôle technique avancé.}
+    \label{fig:meter_details}
+\end{figure}
+
+\subsection{Étape 5 \& 6 — Génération de Token (Attribution)}
+Pour attribuer un compteur à un client :
+1.  Générez un **Token d'Association** unique depuis la fiche du compteur.
+2.  Le système crée un code temporaire sécurisé.
+3.  Transmettez ce code au client (SMS, email, oral).
+4.  Le client utilise ce code dans son application pour finaliser le lien (voir Partie Utilisateur, Étape 4).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{captures/Interfaces/GenererToken.png}
+    \caption{Génération de Token — Clé d'association sécurisée.}
+    \label{fig:generer_token}
+\end{figure}
+
+\section{Gestion des Clients et Finances}
+
+\subsection{Étape 8 \& 9 — Gestion des Utilisateurs}
+Consultez la liste de vos abonnés, leur solde actuel et leurs compteurs associés. Vous pouvez effectuer une **recharge manuelle** pour le compte d'un client (paiement espèce par exemple) directement depuis cette interface.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{captures/Interfaces/UserList.png}
+    \caption{Liste des Utilisateurs — Gestion de la relation client.}
+    \label{fig:user_list}
+\end{figure}
+
+\subsection{Étape 8 — Recharge Manuelle}
+Pratique pour les paiements en espèces, cette fonction permet à l'administrateur de créditer un compteur instantanément. Le solde est mis à jour et la vanne s'ouvre.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{captures/Interfaces/RechargeManuelle.png}
+    \caption{Recharge Manuelle — Crédit direct par l'admin.}
+    \label{fig:recharge_manuelle}
+\end{figure}
+
+\subsection{Étape 10 — Délier un Compteur}
+En cas de déménagement ou de fin de contrat, vous pouvez dissocier un compteur d'un utilisateur en un clic sécurisé. Le compteur redevient alors "libre" et peut être réattribué.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{captures/Interfaces/DelierCompteur.png}
+    \caption{Dissociation — Libération d'un compteur.}
+    \label{fig:delier_compteur}
+\end{figure}
+
+\subsection{Étape 11 \& 12 — Rapports et Historique Global}
+Analysez la performance de votre activité grâce aux rapports détaillés (Financiers, Techniques, Consommation) exportables. L'historique global consolide toutes les transactions du réseau pour une comptabilité précise.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{captures/Interfaces/GenererRapport.png}
+    \caption{Rapports Analytiques — Outils de décision.}
+    \label{fig:generer_rapport}
+\end{figure}
+
+\subsection{Étape 12 — Historique Global des Transactions}
+Une vue consolidée de toutes les transactions du système (tous utilisateurs confondus) pour un audit financier complet.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{captures/Interfaces/Historique des transactions.png}
+    \caption{Historique Global — Audit complet des flux.}
+    \label{fig:historique_global}
+\end{figure}
+
+\section{Administration Système}
+
+\subsection{Étape 13 — Paramètres Administrateur et Système}
+Configurez le profil administrateur, les notifications, la sécurité (2FA), ainsi que les paramètres vitaux du système (Tarif au Litre, Seuils d'alerte).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{captures/Interfaces/ParametresCompteAdmin.png}
+    \caption{Paramètres Admin — Configuration du compte.}
+    \label{fig:parametres_admin}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{captures/Interfaces/Parametres du systeme.png}
+    \caption{Paramètres Système — Configuration globale (Prix, Alertes).}
+    \label{fig:parametres_systeme}
+\end{figure}
 
 \end{document}

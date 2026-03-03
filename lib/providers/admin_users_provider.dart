@@ -26,7 +26,7 @@ class AdminUsersState {
 class AdminUsersNotifier extends Notifier<AdminUsersState> {
   @override
   AdminUsersState build() {
-    _fetchUsers();
+    Future.microtask(() => _fetchUsers());
     return AdminUsersState(isLoading: true);
   }
 

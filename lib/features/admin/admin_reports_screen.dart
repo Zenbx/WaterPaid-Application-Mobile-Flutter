@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
+import '../../shared/widgets/styled_dialog.dart';
 import '../../providers/admin_reports_provider.dart';
 import '../../core/app_theme.dart';
 import '../../models/models.dart';
@@ -114,45 +115,77 @@ class _AdminReportsScreenState extends ConsumerState<AdminReportsScreen> {
     DateTime end = DateTime.now();
     String format = 'CSV';
 
-    showDialog(
+    showStyledDialog(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: const Text('Generate Report'),
-          content: Column(
+      title: 'Generate Report',
+      icon: LucideIcons.filePlus,
+      iconColor: Theme.of(context).extension<AppColors>()!.accent,
+      content: StatefulBuilder(
+        builder: (context, setDialogState) {
+          final colors = Theme.of(context).extension<AppColors>()!;
+          return Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ListTile(
-                title: const Text('Start Date'),
-                subtitle: Text(DateFormat('yyyy-MM-dd').format(start)),
-                trailing: const Icon(LucideIcons.calendar),
-                onTap: () async {
-                  final picked = await showDatePicker(
-                    context: context,
-                    initialDate: start,
-                    firstDate: DateTime(2020),
-                    lastDate: DateTime.now(),
-                  );
-                  if (picked != null) setDialogState(() => start = picked);
-                },
+              Container(
+                decoration: BoxDecoration(
+                  color: colors.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: colors.border),
+                ),
+                child: Column(
+                  children: [
+                    ListTile(
+                      leading: const Icon(LucideIcons.calendar),
+                      title: const Text(
+                        'Start Date',
+                        style: TextStyle(fontSize: 14),
+                      ),
+                      subtitle: Text(DateFormat('yyyy-MM-dd').format(start)),
+                      onTap: () async {
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: start,
+                          firstDate: DateTime(2020),
+                          lastDate: DateTime.now(),
+                        );
+                        if (picked != null) {
+                          setDialogState(() => start = picked);
+                        }
+                      },
+                    ),
+                    Divider(height: 1, color: colors.border),
+                    ListTile(
+                      leading: const Icon(LucideIcons.calendar),
+                      title: const Text(
+                        'End Date',
+                        style: TextStyle(fontSize: 14),
+                      ),
+                      subtitle: Text(DateFormat('yyyy-MM-dd').format(end)),
+                      onTap: () async {
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: end,
+                          firstDate: DateTime(2020),
+                          lastDate: DateTime.now(),
+                        );
+                        if (picked != null) {
+                          setDialogState(() => end = picked);
+                        }
+                      },
+                    ),
+                  ],
+                ),
               ),
-              ListTile(
-                title: const Text('End Date'),
-                subtitle: Text(DateFormat('yyyy-MM-dd').format(end)),
-                trailing: const Icon(LucideIcons.calendar),
-                onTap: () async {
-                  final picked = await showDatePicker(
-                    context: context,
-                    initialDate: end,
-                    firstDate: DateTime(2020),
-                    lastDate: DateTime.now(),
-                  );
-                  if (picked != null) setDialogState(() => end = picked);
-                },
-              ),
+              const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 value: format,
-                decoration: const InputDecoration(labelText: 'Format'),
+                decoration: InputDecoration(
+                  labelText: 'Format',
+                  prefixIcon: const Icon(LucideIcons.fileText),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
                 items: ['CSV', 'PDF']
                     .map((f) => DropdownMenuItem(value: f, child: Text(f)))
                     .toList(),
@@ -161,24 +194,15 @@ class _AdminReportsScreenState extends ConsumerState<AdminReportsScreen> {
                 },
               ),
             ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.pop(context);
-                await ref
-                    .read(adminReportsProvider.notifier)
-                    .createReport(start, end, format);
-              },
-              child: const Text('Generate'),
-            ),
-          ],
-        ),
+          );
+        },
       ),
+      confirmLabel: 'Generate',
+      onConfirm: () async {
+        await ref
+            .read(adminReportsProvider.notifier)
+            .createReport(start, end, format);
+      },
     );
   }
 }

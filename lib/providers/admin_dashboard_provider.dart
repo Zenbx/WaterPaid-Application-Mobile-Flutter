@@ -55,7 +55,8 @@ class AdminDashboardState {
 class AdminDashboardNotifier extends Notifier<AdminDashboardState> {
   @override
   AdminDashboardState build() {
-    _fetchData();
+    // Initial fetch
+    Future.microtask(() => _fetchData());
     return AdminDashboardState(isLoading: true);
   }
 

@@ -137,6 +137,8 @@ class DashboardScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                _buildAlerts(context, data, colors),
+                const SizedBox(height: 12),
                 Text(
                   'Current Water Level',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -462,6 +464,97 @@ class _RefillItem extends StatelessWidget {
             style: TextStyle(
               color: colors.success,
               fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------
+// Helper components for alerts and badges
+// ---------------------------------------------------------
+
+extension on DashboardScreen {
+  Widget _buildAlerts(
+    BuildContext context,
+    DashboardDataModel data,
+    AppColors colors,
+  ) {
+    final List<Widget> alerts = [];
+
+    if (data.currentBalance <= 0) {
+      alerts.add(
+        const _AlertBadge(
+          icon: LucideIcons.alertTriangle,
+          label: 'CRÉDIT ÉPUISÉ',
+          color: Colors.red,
+        ),
+      );
+    } else if (data.currentBalance < 1000) {
+      alerts.add(
+        const _AlertBadge(
+          icon: LucideIcons.info,
+          label: 'SOLDE FAIBLE',
+          color: Colors.orange,
+        ),
+      );
+    }
+
+    for (final meter in data.meters) {
+      if (meter.valveState == 'closed' && data.currentBalance > 0) {
+        alerts.add(
+          const _AlertBadge(
+            icon: LucideIcons.droplets,
+            label: 'VALVE FERMÉE',
+            color: Colors.red,
+          ),
+        );
+      }
+    }
+
+    if (alerts.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Wrap(spacing: 8, runSpacing: 8, children: alerts),
+    );
+  }
+}
+
+class _AlertBadge extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  const _AlertBadge({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withOpacity(0.5)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
             ),
           ),
         ],

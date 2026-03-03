@@ -30,7 +30,7 @@ class AdminMetersState {
 class AdminMetersNotifier extends Notifier<AdminMetersState> {
   @override
   AdminMetersState build() {
-    _fetchMeters();
+    Future.microtask(() => _fetchMeters());
     return AdminMetersState(isLoading: true);
   }
 

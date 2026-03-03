@@ -11,9 +11,16 @@ import 'features/profile/profile_screen.dart';
 import 'features/meter/link_meter_screen.dart';
 import 'features/refill/refill_screen.dart';
 
+import 'core/notification_service.dart';
 import 'features/admin/admin_main_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final notificationService = NotificationService();
+  await notificationService.init();
+  await notificationService.requestPermissions();
+
   runApp(const ProviderScope(child: WaterPaidApp()));
 }
 
@@ -30,7 +37,7 @@ class WaterPaidApp extends ConsumerWidget {
         return const Scaffold(body: Center(child: CircularProgressIndicator()));
       }
       if (authState.isAuthenticated) {
-        return authState.isAdmin ? const AdminMainScreen() : const MainScreen();
+        return authState.isAdmin ? AdminMainScreen() : MainScreen();
       }
       return const LoginScreen();
     }
@@ -45,7 +52,7 @@ class WaterPaidApp extends ConsumerWidget {
       routes: {
         '/link-meter': (context) => const LinkMeterScreen(),
         '/refill': (context) => const RefillScreen(),
-        '/admin-main': (context) => const AdminMainScreen(),
+        '/admin-main': (context) => AdminMainScreen(),
       },
     );
   }

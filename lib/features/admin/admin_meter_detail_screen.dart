@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
+import '../../shared/widgets/styled_dialog.dart';
 import '../../providers/admin_meters_provider.dart';
 import '../../core/app_theme.dart';
 import '../../models/models.dart';
@@ -256,185 +257,176 @@ class AdminMeterDetailScreen extends ConsumerWidget {
   }
 
   void _confirmDelete(BuildContext context, WidgetRef ref) {
-    showDialog(
+    _showStyledDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Meter'),
-        content: const Text(
-          'Are you sure you want to delete this meter? This action cannot be undone.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              await ref
-                  .read(adminMetersProvider.notifier)
-                  .deleteMeter(meter.meterId);
-              if (context.mounted) Navigator.pop(context);
-            },
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
+      title: 'Delete Meter',
+      description:
+          'Are you sure you want to delete this meter? This action cannot be undone and all associated data will be lost.',
+      icon: LucideIcons.trash2,
+      iconColor: Colors.red,
+      confirmLabel: 'Delete',
+      confirmColor: Colors.red,
+      onConfirm: () async {
+        await ref.read(adminMetersProvider.notifier).deleteMeter(meter.meterId);
+        if (context.mounted) Navigator.pop(context);
+      },
     );
   }
 
   void _confirmGenerateToken(BuildContext context, WidgetRef ref) {
-    showDialog(
+    _showStyledDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Generate Token'),
-        content: const Text(
-          'This will invalidate the previous token. Proceed?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              await ref
-                  .read(adminMetersProvider.notifier)
-                  .generateToken(meter.meterId);
-            },
-            child: const Text('Generate'),
-          ),
-        ],
-      ),
+      title: 'Generate Token',
+      description:
+          'This will invalidate the current token. The user will need the new token to link this meter.',
+      icon: LucideIcons.refreshCw,
+      iconColor: Colors.orange,
+      confirmLabel: 'Generate',
+      confirmColor: Colors.orange,
+      onConfirm: () async {
+        await ref
+            .read(adminMetersProvider.notifier)
+            .generateToken(meter.meterId);
+      },
     );
   }
 
   void _confirmUnlinkUser(BuildContext context, WidgetRef ref) {
-    showDialog(
+    _showStyledDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Unlink User'),
-        content: const Text(
-          'Are you sure you want to remove the user from this meter? '
-          'The user will no longer be able to use this meter.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              try {
-                await ref
-                    .read(adminMetersProvider.notifier)
-                    .unlinkUser(meter.meterId);
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('User unlinked from meter successfully'),
-                    ),
-                  );
-                  Navigator.pop(context);
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Failed to unlink user: $e'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
-              }
-            },
-            child: const Text('Unlink', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
+      title: 'Unlink User',
+      description:
+          'Are you sure you want to remove the user from this meter? They will lose access immediately.',
+      icon: LucideIcons.userX,
+      iconColor: Colors.red,
+      confirmLabel: 'Unlink',
+      confirmColor: Colors.red,
+      onConfirm: () async {
+        try {
+          await ref
+              .read(adminMetersProvider.notifier)
+              .unlinkUser(meter.meterId);
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('User unlinked successfully')),
+            );
+            Navigator.pop(context);
+          }
+        } catch (e) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Failed to unlink: $e'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
+      },
     );
   }
 
   void _showLinkDeviceDialog(BuildContext context, WidgetRef ref) {
     final controller = TextEditingController(text: meter.deviceId);
-    showDialog(
+    final colors = Theme.of(context).extension<AppColors>()!;
+
+    _showStyledDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Link Device ID'),
-        content: TextField(
-          controller: controller,
-          decoration: const InputDecoration(
-            hintText: 'Enter DevEui / Device ID',
-          ),
+      title: 'Link Device ID',
+      icon: LucideIcons.link,
+      iconColor: colors.accent,
+      content: TextField(
+        controller: controller,
+        autofocus: true,
+        decoration: InputDecoration(
+          labelText: 'DevEui / Device ID',
+          hintText: 'e.g. 0080E11505011234',
+          prefixIcon: const Icon(LucideIcons.cpu),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              await ref
-                  .read(adminMetersProvider.notifier)
-                  .linkDevice(meter.meterId, controller.text.trim());
-            },
-            child: const Text('Link'),
-          ),
-        ],
       ),
+      confirmLabel: 'Link Device',
+      onConfirm: () async {
+        if (controller.text.trim().isEmpty) return;
+        await ref
+            .read(adminMetersProvider.notifier)
+            .linkDevice(meter.meterId, controller.text.trim());
+      },
     );
   }
 
   void _showRechargeDialog(BuildContext context, WidgetRef ref) {
     final volumeController = TextEditingController();
     final priceController = TextEditingController();
-    showDialog(
+
+    _showStyledDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Manual Recharge'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: volumeController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Volume (L)',
-                hintText: 'e.g. 500',
+      title: 'Manual Recharge',
+      icon: LucideIcons.droplets,
+      iconColor: Colors.green,
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            controller: volumeController,
+            keyboardType: TextInputType.number,
+            autofocus: true,
+            decoration: InputDecoration(
+              labelText: 'Volume (L)',
+              prefixIcon: const Icon(LucideIcons.droplet),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: priceController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Price (FCFA)',
-                hintText: 'e.g. 250',
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
           ),
-          TextButton(
-            onPressed: () async {
-              final vol = double.tryParse(volumeController.text) ?? 0;
-              final pri = double.tryParse(priceController.text) ?? 0;
-              Navigator.pop(context);
-              await ref
-                  .read(adminMetersProvider.notifier)
-                  .refillMeter(meter.meterId, vol, pri);
-            },
-            child: const Text('Recharge'),
+          const SizedBox(height: 16),
+          TextField(
+            controller: priceController,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              labelText: 'Price (FCFA)',
+              prefixIcon: const Icon(LucideIcons.banknote),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
           ),
         ],
       ),
+      confirmLabel: 'Confirm Recharge',
+      confirmColor: Colors.green,
+      onConfirm: () async {
+        final vol = double.tryParse(volumeController.text) ?? 0;
+        final pri = double.tryParse(priceController.text) ?? 0;
+        if (vol <= 0) return;
+        await ref
+            .read(adminMetersProvider.notifier)
+            .refillMeter(meter.meterId, vol, pri);
+      },
+    );
+  }
+
+  void _showStyledDialog({
+    required BuildContext context,
+    required String title,
+    String? description,
+    Widget? content,
+    required IconData icon,
+    required Color iconColor,
+    required String confirmLabel,
+    required Future<void> Function() onConfirm,
+    Color? confirmColor,
+  }) {
+    showStyledDialog(
+      context: context,
+      title: title,
+      description: description,
+      content: content,
+      icon: icon,
+      iconColor: iconColor,
+      confirmLabel: confirmLabel,
+      onConfirm: onConfirm,
+      confirmColor: confirmColor,
     );
   }
 }

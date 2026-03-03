@@ -129,10 +129,66 @@ class _RefillScreenState extends ConsumerState<RefillScreen> {
               decoration: InputDecoration(
                 labelText: 'Amount (FCFA)',
                 prefixIcon: const Icon(LucideIcons.banknote),
+                hintText: 'Enter amount...',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
+            ),
+            const SizedBox(height: 12),
+
+            // Quick Presets
+            Text(
+              'Quick Selection (L)',
+              style: TextStyle(
+                color: colors.textSecondary,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [10, 25, 50, 100].map((volume) {
+                // Assuming 50 FCFA per liter as a default
+                final price = volume * 50;
+                return Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: OutlinedButton(
+                      onPressed: () {
+                        setState(() {
+                          _amountController.text = price.toString();
+                        });
+                      },
+                      style: OutlinedButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        side: BorderSide(
+                          color: _amountController.text == price.toString()
+                              ? colors.accent
+                              : colors.border,
+                        ),
+                        backgroundColor:
+                            _amountController.text == price.toString()
+                            ? colors.accent.withOpacity(0.1)
+                            : null,
+                      ),
+                      child: Text(
+                        '${volume}L',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: _amountController.text == price.toString()
+                              ? colors.accent
+                              : colors.textPrimary,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
             ),
             const SizedBox(height: 24),
 

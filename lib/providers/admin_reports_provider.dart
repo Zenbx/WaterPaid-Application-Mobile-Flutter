@@ -29,7 +29,7 @@ class AdminReportsState {
 class AdminReportsNotifier extends Notifier<AdminReportsState> {
   @override
   AdminReportsState build() {
-    _fetchReports();
+    Future.microtask(() => _fetchReports());
     return AdminReportsState(isLoading: true);
   }
 

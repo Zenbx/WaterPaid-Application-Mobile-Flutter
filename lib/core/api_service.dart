@@ -12,7 +12,7 @@ class ApiService {
   ApiService() {
     _dio = Dio(
       BaseOptions(
-        baseUrl: 'https://waterpaid-api.onrender.com',
+        baseUrl: 'https://wp-api-tmbm.onrender.com',
         headers: {'Content-Type': 'application/json'},
         connectTimeout: const Duration(seconds: 30),
         receiveTimeout: const Duration(seconds: 30),

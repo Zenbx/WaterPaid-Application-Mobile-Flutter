@@ -14,7 +14,7 @@ class LoginScreen extends ConsumerStatefulWidget {
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _phoneController = TextEditingController();
+  final _phoneController = TextEditingController(text: '+237 ');
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
@@ -27,9 +27,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
+      final sanitizedPhone = _phoneController.text.replaceAll(' ', '');
       await ref
           .read(authProvider.notifier)
-          .login(_phoneController.text.trim(), _passwordController.text);
+          .login(sanitizedPhone, _passwordController.text);
     }
   }
 

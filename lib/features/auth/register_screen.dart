@@ -13,7 +13,7 @@ class RegisterScreen extends ConsumerStatefulWidget {
 
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _phoneController = TextEditingController();
+  final _phoneController = TextEditingController(text: '+237 ');
   final _pseudoController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
@@ -29,10 +29,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   Future<void> _handleRegister() async {
     if (_formKey.currentState!.validate()) {
+      final sanitizedPhone = _phoneController.text.replaceAll(' ', '');
       await ref
           .read(authProvider.notifier)
           .signup(
-            _phoneController.text.trim(),
+            sanitizedPhone,
             _pseudoController.text.trim(),
             _passwordController.text,
             userType: _selectedRole,

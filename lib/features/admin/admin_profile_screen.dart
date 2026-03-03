@@ -5,6 +5,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../models/models.dart';
 import '../../core/app_theme.dart';
+import '../../shared/widgets/styled_dialog.dart';
 import 'admin_reports_screen.dart';
 import 'admin_settings_screen.dart';
 
@@ -193,96 +194,87 @@ class AdminProfileScreen extends ConsumerWidget {
     final pseudoController = TextEditingController(text: user.pseudo);
     final phoneController = TextEditingController(text: user.phoneNumber);
 
-    showDialog(
+    showStyledDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Edit Admin Profile'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: pseudoController,
-              decoration: const InputDecoration(labelText: 'Pseudo'),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: phoneController,
-              decoration: const InputDecoration(labelText: 'Phone Number'),
-              keyboardType: TextInputType.phone,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+      title: 'Edit Admin Profile',
+      description: 'Update your administrator credentials',
+      icon: LucideIcons.userCheck,
+      iconColor: Theme.of(context).extension<AppColors>()!.accent,
+      confirmLabel: 'Save',
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            controller: pseudoController,
+            decoration: const InputDecoration(labelText: 'Pseudo'),
           ),
-          FilledButton(
-            onPressed: () async {
-              try {
-                await ref
-                    .read(authProvider.notifier)
-                    .updateProfile(
-                      pseudo: pseudoController.text.trim(),
-                      phone: phoneController.text.trim(),
-                    );
-                if (context.mounted) Navigator.pop(context);
-              } catch (e) {
-                // Error shown via authProvider state
-              }
-            },
-            child: const Text('Save'),
+          const SizedBox(height: 12),
+          TextField(
+            controller: phoneController,
+            decoration: const InputDecoration(labelText: 'Phone Number'),
+            keyboardType: TextInputType.phone,
           ),
         ],
       ),
+      onConfirm: () async {
+        await ref
+            .read(authProvider.notifier)
+            .updateProfile(
+              pseudo: pseudoController.text.trim(),
+              phone: phoneController.text.trim(),
+            );
+      },
     );
   }
 
   void _showThemeDialog(BuildContext context, WidgetRef ref) {
     final currentTheme = ref.read(themeProvider);
-    showDialog(
+    showStyledDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('App Theme'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            RadioListTile<ThemeMode>(
-              title: const Text('Light'),
-              value: ThemeMode.light,
-              groupValue: currentTheme,
-              onChanged: (val) {
-                if (val != null) {
-                  ref.read(themeProvider.notifier).setTheme(val);
-                  Navigator.pop(context);
-                }
-              },
-            ),
-            RadioListTile<ThemeMode>(
-              title: const Text('Dark'),
-              value: ThemeMode.dark,
-              groupValue: currentTheme,
-              onChanged: (val) {
-                if (val != null) {
-                  ref.read(themeProvider.notifier).setTheme(val);
-                  Navigator.pop(context);
-                }
-              },
-            ),
-            RadioListTile<ThemeMode>(
-              title: const Text('System Default'),
-              value: ThemeMode.system,
-              groupValue: currentTheme,
-              onChanged: (val) {
-                if (val != null) {
-                  ref.read(themeProvider.notifier).setTheme(val);
-                  Navigator.pop(context);
-                }
-              },
-            ),
-          ],
-        ),
+      title: 'App Theme',
+      description: 'Choose between light or dark mode',
+      icon: LucideIcons.eye,
+      iconColor: Theme.of(context).extension<AppColors>()!.accent,
+      confirmLabel: 'Done',
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          RadioListTile<ThemeMode>(
+            title: const Text('Light'),
+            value: ThemeMode.light,
+            groupValue: currentTheme,
+            onChanged: (val) {
+              if (val != null) {
+                ref.read(themeProvider.notifier).setTheme(val);
+                Navigator.pop(context);
+              }
+            },
+          ),
+          RadioListTile<ThemeMode>(
+            title: const Text('Dark'),
+            value: ThemeMode.dark,
+            groupValue: currentTheme,
+            onChanged: (val) {
+              if (val != null) {
+                ref.read(themeProvider.notifier).setTheme(val);
+                Navigator.pop(context);
+              }
+            },
+          ),
+          RadioListTile<ThemeMode>(
+            title: const Text('System Default'),
+            value: ThemeMode.system,
+            groupValue: currentTheme,
+            onChanged: (val) {
+              if (val != null) {
+                ref.read(themeProvider.notifier).setTheme(val);
+                Navigator.pop(context);
+              }
+            },
+          ),
+        ],
       ),
+      onConfirm: () async {},
     );
   }
 
@@ -290,53 +282,40 @@ class AdminProfileScreen extends ConsumerWidget {
     final oldController = TextEditingController();
     final newController = TextEditingController();
 
-    showDialog(
+    showStyledDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Change Password'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: oldController,
-              obscureText: true,
-              decoration: const InputDecoration(labelText: 'Old Password'),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: newController,
-              obscureText: true,
-              decoration: const InputDecoration(labelText: 'New Password'),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+      title: 'Change Password',
+      description: 'Update your administrator password',
+      icon: LucideIcons.shieldAlert,
+      iconColor: Theme.of(context).extension<AppColors>()!.warning,
+      confirmLabel: 'Update',
+      confirmColor: Theme.of(context).extension<AppColors>()!.warning,
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            controller: oldController,
+            obscureText: true,
+            decoration: const InputDecoration(labelText: 'Old Password'),
           ),
-          FilledButton(
-            onPressed: () async {
-              try {
-                await ref
-                    .read(authProvider.notifier)
-                    .changePassword(oldController.text, newController.text);
-                if (context.mounted) {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Password updated successfully'),
-                    ),
-                  );
-                }
-              } catch (e) {
-                // Error shown via authProvider
-              }
-            },
-            child: const Text('Update'),
+          const SizedBox(height: 12),
+          TextField(
+            controller: newController,
+            obscureText: true,
+            decoration: const InputDecoration(labelText: 'New Password'),
           ),
         ],
       ),
+      onConfirm: () async {
+        await ref
+            .read(authProvider.notifier)
+            .changePassword(oldController.text, newController.text);
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Password updated successfully')),
+          );
+        }
+      },
     );
   }
 }

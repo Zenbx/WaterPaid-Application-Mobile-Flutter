@@ -10,6 +10,7 @@ class AppColors extends ThemeExtension<AppColors> {
   final Color textSecondary;
   final Color success;
   final Color danger;
+  final Color warning;
   final Color border;
 
   AppColors({
@@ -21,6 +22,7 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.textSecondary,
     required this.success,
     required this.danger,
+    required this.warning,
     required this.border,
   });
 
@@ -34,6 +36,7 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? textSecondary,
     Color? success,
     Color? danger,
+    Color? warning,
     Color? border,
   }) {
     return AppColors(
@@ -45,6 +48,7 @@ class AppColors extends ThemeExtension<AppColors> {
       textSecondary: textSecondary ?? this.textSecondary,
       success: success ?? this.success,
       danger: danger ?? this.danger,
+      warning: warning ?? this.warning,
       border: border ?? this.border,
     );
   }
@@ -61,6 +65,7 @@ class AppColors extends ThemeExtension<AppColors> {
       textSecondary: Color.lerp(textSecondary, other.textSecondary, t)!,
       success: Color.lerp(success, other.success, t)!,
       danger: Color.lerp(danger, other.danger, t)!,
+      warning: Color.lerp(warning, other.warning, t)!,
       border: Color.lerp(border, other.border, t)!,
     );
   }
@@ -74,6 +79,7 @@ class AppColors extends ThemeExtension<AppColors> {
     textSecondary: const Color(0xFF64748B),
     success: const Color(0xFF10B981),
     danger: const Color(0xFFEF4444),
+    warning: const Color(0xFFF59E0B),
     border: const Color(0xFFE2E8F0),
   );
 
@@ -86,6 +92,7 @@ class AppColors extends ThemeExtension<AppColors> {
     textSecondary: const Color(0xFF94A3B8),
     success: const Color(0xFF10B981),
     danger: const Color(0xFFEF4444),
+    warning: const Color(0xFFF59E0B),
     border: const Color(0xFF1E293B),
   );
 }
